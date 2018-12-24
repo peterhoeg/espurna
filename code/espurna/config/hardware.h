@@ -1255,7 +1255,7 @@
     #define LIGHT_CH1_PIN       12      // RED
     #define LIGHT_CH2_PIN       5       // GREEN
     #define LIGHT_CH3_PIN       13      // BLUE
-    #define LIGHT_CH4_PIN       14      // WHITE
+    #define LIGHT_CH4_PIN       15      // WHITE
     #define LIGHT_CH1_INVERSE   0
     #define LIGHT_CH2_INVERSE   0
     #define LIGHT_CH3_INVERSE   0
