@@ -214,10 +214,10 @@ void _mqttConnect() {
 }
 
 void _mqttPlaceholders(String *text) {
-    
+
     text->replace("{hostname}", getSetting("hostname"));
     text->replace("{magnitude}", "#");
-    
+
     String mac = WiFi.macAddress();
     mac.replace(":", "");
     text->replace("{mac}", mac);

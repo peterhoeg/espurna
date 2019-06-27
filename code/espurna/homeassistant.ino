@@ -1,8 +1,8 @@
 /*
 
-HOME ASSISTANT MODULE
+  HOME ASSISTANT MODULE
 
-Copyright (C) 2017-2018 by Xose Pérez <xose dot perez at gmail dot com>
+  Copyright (C) 2017-2018 by Xose Pérez <xose dot perez at gmail dot com>
 
 */
 
@@ -45,7 +45,7 @@ void _haSendMagnitudes(const JsonObject& deviceConfig) {
     for (unsigned char i=0; i<magnitudeCount(); i++) {
 
         String topic = getSetting("haPrefix", HOMEASSISTANT_PREFIX) +
-            "/sensor/" +
+            "/" + MQTT_TOPIC_SENSOR + "/" +
             getSetting("hostname") + "_" + String(i) +
             "/config";
 
@@ -56,7 +56,7 @@ void _haSendMagnitudes(const JsonObject& deviceConfig) {
             _haSendMagnitude(i, config);
             config["uniq_id"] = getIdentifier() + "_" + magnitudeTopic(magnitudeType(i)) + "_" + String(i);
             config["device"] = deviceConfig;
-            
+
             config.printTo(output);
             jsonBuffer.clear();
         }
@@ -94,36 +94,36 @@ void _haSendSwitch(unsigned char i, JsonObject& config) {
         config["payload_not_available"] = String(HOMEASSISTANT_PAYLOAD_NOT_AVAILABLE);
     }
 
-    #if LIGHT_PROVIDER != LIGHT_PROVIDER_NONE
+#if LIGHT_PROVIDER != LIGHT_PROVIDER_NONE
 
-        if (i == 0) {
+    if (i == 0) {
 
-            if (lightHasColor()) {
-                config["brightness_state_topic"] = mqttTopic(MQTT_TOPIC_BRIGHTNESS, false);
-                config["brightness_command_topic"] = mqttTopic(MQTT_TOPIC_BRIGHTNESS, true);
-                config["rgb_state_topic"] = mqttTopic(MQTT_TOPIC_COLOR_RGB, false);
-                config["rgb_command_topic"] = mqttTopic(MQTT_TOPIC_COLOR_RGB, true);
-                config["color_temp_command_topic"] = mqttTopic(MQTT_TOPIC_MIRED, true);
-            }
-
-            if (lightChannels() > 3) {
-                config["white_value_state_topic"] = mqttTopic(MQTT_TOPIC_CHANNEL, 3, false);
-                config["white_value_command_topic"] = mqttTopic(MQTT_TOPIC_CHANNEL, 3, true);
-            }
-
+        if (lightHasColor()) {
+            config["brightness_state_topic"] = mqttTopic(MQTT_TOPIC_BRIGHTNESS, false);
+            config["brightness_command_topic"] = mqttTopic(MQTT_TOPIC_BRIGHTNESS, true);
+            config["rgb_state_topic"] = mqttTopic(MQTT_TOPIC_COLOR_RGB, false);
+            config["rgb_command_topic"] = mqttTopic(MQTT_TOPIC_COLOR_RGB, true);
+            config["color_temp_command_topic"] = mqttTopic(MQTT_TOPIC_MIRED, true);
         }
 
-    #endif // LIGHT_PROVIDER != LIGHT_PROVIDER_NONE
+        if (lightChannels() > 3) {
+            config["white_value_state_topic"] = mqttTopic(MQTT_TOPIC_CHANNEL, 3, false);
+            config["white_value_command_topic"] = mqttTopic(MQTT_TOPIC_CHANNEL, 3, true);
+        }
+
+    }
+
+#endif // LIGHT_PROVIDER != LIGHT_PROVIDER_NONE
 
 }
 
 void _haSendSwitches(const JsonObject& deviceConfig) {
 
-    #if (LIGHT_PROVIDER != LIGHT_PROVIDER_NONE) || (defined(ITEAD_SLAMPHER))
-        String type = String("light");
-    #else
-        String type = String("switch");
-    #endif
+#if (LIGHT_PROVIDER != LIGHT_PROVIDER_NONE) || (defined(ITEAD_SLAMPHER))
+    String type = MQTT_TOPIC_LIGHT;
+#else
+    String type = MQTT_TOPIC_SWITCH;
+#endif
 
     for (unsigned char i=0; i<relayCount(); i++) {
 
@@ -155,11 +155,11 @@ void _haSendSwitches(const JsonObject& deviceConfig) {
 
 void _haDumpConfig(std::function<void(String&)> printer, bool wrapJson = false) {
 
-    #if (LIGHT_PROVIDER != LIGHT_PROVIDER_NONE) || (defined(ITEAD_SLAMPHER))
-        String type = String("light");
-    #else
-        String type = String("switch");
-    #endif
+#if (LIGHT_PROVIDER != LIGHT_PROVIDER_NONE) || (defined(ITEAD_SLAMPHER))
+    String type = String("light");
+#else
+    String type = String("switch");
+#endif
 
     for (unsigned char i=0; i<relayCount(); i++) {
 
@@ -201,56 +201,56 @@ void _haDumpConfig(std::function<void(String&)> printer, bool wrapJson = false) 
 
     }
 
-    #if SENSOR_SUPPORT
+#if SENSOR_SUPPORT
 
-        for (unsigned char i=0; i<magnitudeCount(); i++) {
+    for (unsigned char i=0; i<magnitudeCount(); i++) {
 
-            DynamicJsonBuffer jsonBuffer;
-            JsonObject& config = jsonBuffer.createObject();
-            _haSendMagnitude(i, config);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& config = jsonBuffer.createObject();
+        _haSendMagnitude(i, config);
 
-            String output;
-            output.reserve(config.measureLength() + 32);
+        String output;
+        output.reserve(config.measureLength() + 32);
 
-            if (wrapJson) {
-                output += "{\"haConfig\": \"";
-            }
-
-            output += "\n\nsensor:\n";
-            bool first = true;
-
-            for (auto kv : config) {
-                if (first) {
-                    output += "  - ";
-                    first = false;
-                } else {
-                    output += "    ";
-                }
-                String value = kv.value.as<String>();
-                value.replace("%", "'%'");
-                output += kv.key;
-                output += ": ";
-                output += value;
-                output += "\n";
-            }
-            output += " ";
-
-            if (wrapJson) {
-                output += "\"}";
-            }
-
-            jsonBuffer.clear();
-
-            printer(output);
-
+        if (wrapJson) {
+            output += "{\"haConfig\": \"";
         }
 
-    #endif
+        output += "\n\nsensor:\n";
+        bool first = true;
+
+        for (auto kv : config) {
+            if (first) {
+                output += "  - ";
+                first = false;
+            } else {
+                output += "    ";
+            }
+            String value = kv.value.as<String>();
+            value.replace("%", "'%'");
+            output += kv.key;
+            output += ": ";
+            output += value;
+            output += "\n";
+        }
+        output += " ";
+
+        if (wrapJson) {
+            output += "\"}";
+        }
+
+        jsonBuffer.clear();
+
+        printer(output);
+
+    }
+
+#endif
 }
 
 void _haGetDeviceConfig(JsonObject& config) {
     String identifier = getIdentifier();
-    
+
     config.createNestedArray("identifiers").add(identifier);
     config["name"] = getSetting("desc", getSetting("hostname"));
     config["manufacturer"] = String(MANUFACTURER);
@@ -275,10 +275,10 @@ void _haSend() {
 
     // Send messages
     _haSendSwitches(deviceConfig);
-    #if SENSOR_SUPPORT
-        _haSendMagnitudes(deviceConfig);
-    #endif
-    
+#if SENSOR_SUPPORT
+    _haSendMagnitudes(deviceConfig);
+#endif
+
     jsonBuffer.clear();
     _haSendFlag = false;
 
@@ -318,30 +318,30 @@ void _haWebSocketOnAction(uint32_t client_id, const char * action, JsonObject& d
 void _haInitCommands() {
 
     terminalRegisterCommand(F("HA.CONFIG"), [](Embedis* e) {
-        _haDumpConfig([](String& data) {
-            DEBUG_MSG(data.c_str());
+            _haDumpConfig([](String& data) {
+                    DEBUG_MSG(data.c_str());
+                });
+            DEBUG_MSG("\n");
+            terminalOK();
         });
-        DEBUG_MSG("\n");
-        terminalOK();
-    });
 
     terminalRegisterCommand(F("HA.SEND"), [](Embedis* e) {
-        setSetting("haEnabled", "1");
-        _haConfigure();
-        #if WEB_SUPPORT
+            setSetting("haEnabled", "1");
+            _haConfigure();
+#if WEB_SUPPORT
             wsSend(_haWebSocketOnSend);
-        #endif
-        terminalOK();
-    });
+#endif
+            terminalOK();
+        });
 
     terminalRegisterCommand(F("HA.CLEAR"), [](Embedis* e) {
-        setSetting("haEnabled", "0");
-        _haConfigure();
-        #if WEB_SUPPORT
+            setSetting("haEnabled", "0");
+            _haConfigure();
+#if WEB_SUPPORT
             wsSend(_haWebSocketOnSend);
-        #endif
-        terminalOK();
-    });
+#endif
+            terminalOK();
+        });
 
 }
 
@@ -360,9 +360,9 @@ void _haLoop() {
 
     // TODO check wsConnected after each "printer" call?
     _haDumpConfig([client_id](String& output) {
-        wsSend(client_id, output.c_str());
-        yield();
-    }, true);
+            wsSend(client_id, output.c_str());
+            yield();
+        }, true);
 }
 #endif
 
@@ -370,21 +370,21 @@ void haSetup() {
 
     _haConfigure();
 
-    #if WEB_SUPPORT
-        wsOnSendRegister(_haWebSocketOnSend);
-        wsOnActionRegister(_haWebSocketOnAction);
-        wsOnReceiveRegister(_haWebSocketOnReceive);
-        espurnaRegisterLoop(_haLoop);
-    #endif
+#if WEB_SUPPORT
+    wsOnSendRegister(_haWebSocketOnSend);
+    wsOnActionRegister(_haWebSocketOnAction);
+    wsOnReceiveRegister(_haWebSocketOnReceive);
+    espurnaRegisterLoop(_haLoop);
+#endif
 
-    #if TERMINAL_SUPPORT
-        _haInitCommands();
-    #endif
+#if TERMINAL_SUPPORT
+    _haInitCommands();
+#endif
 
     // On MQTT connect check if we have something to send
     mqttRegister([](unsigned int type, const char * topic, const char * payload) {
-        if (type == MQTT_CONNECT_EVENT) _haSend();
-    });
+            if (type == MQTT_CONNECT_EVENT) _haSend();
+        });
 
     // Main callbacks
     espurnaRegisterReload(_haConfigure);

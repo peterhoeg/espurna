@@ -121,7 +121,7 @@ void _relayProviderStatus(unsigned char id, bool status) {
 
             lightUpdate(true, true);
             return;
-        
+
         }
 
     #endif
@@ -175,7 +175,7 @@ void _relayProcess(bool mode) {
         // Only process if the change_time has arrived
         if (current_time < _relays[id].change_time) continue;
 
-        DEBUG_MSG_P(PSTR("[RELAY] #%d set to %s\n"), id, target ? "ON" : "OFF");
+        DEBUG_MSG_P(PSTR("[RELAY] #%d set to %s\n"), id, target ? RELAY_MQTT_ON : RELAY_MQTT_OFF);
 
         // Call the provider to perform the action
         _relayProviderStatus(id, target);
@@ -325,7 +325,7 @@ bool relayStatus(unsigned char id, bool status, bool report, bool group_report) 
         relaySync(id);
 
         DEBUG_MSG_P(PSTR("[RELAY] #%d scheduled %s in %u ms\n"),
-                id, status ? "ON" : "OFF",
+                id, status ? RELAY_MQTT_ON : RELAY_MQTT_OFF,
                 (_relays[id].change_time - current_time));
 
         changed = true;
@@ -461,9 +461,9 @@ unsigned char relayParsePayload(const char * payload) {
     }
 
     unsigned int value = 0xFF;
-    if (strcmp(p, "off") == 0) {
+    if (strcmp(p, RELAY_MQTT_OFF) == 0) {
         value = 0;
-    } else if (strcmp(p, "on") == 0) {
+    } else if (strcmp(p, RELAY_MQTT_ON) == 0) {
         value = 1;
     } else if (strcmp(p, "toggle") == 0) {
         value = 2;

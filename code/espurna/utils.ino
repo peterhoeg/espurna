@@ -147,46 +147,47 @@ unsigned long getUptime() {
 // Heartbeat helper
 // -----------------------------------------------------------------------------
 namespace Heartbeat {
-    enum Report : uint32_t { 
-        Status = 1 << 1,
-        Ssid = 1 << 2,
-        Ip = 1 << 3,
-        Mac = 1 << 4,
-        Rssi = 1 << 5,
-        Uptime = 1 << 6,
-        Datetime = 1 << 7,
-        Freeheap = 1 << 8,
-        Vcc = 1 << 9,
-        Relay = 1 << 10,
-        Light = 1 << 11,
-        Hostname = 1 << 12,
+    enum Report : uint32_t {
         App = 1 << 13,
-        Version = 1 << 14,
         Board = 1 << 15,
-        Loadavg = 1 << 16,
+        Datetime = 1 << 7,
+        Description = 1 << 18,
+        Freeheap = 1 << 8,
+        Hostname = 1 << 12,
         Interval = 1 << 17,
-        Description = 1 << 18
+        Ip = 1 << 3,
+        Light = 1 << 11,
+        Loadavg = 1 << 16,
+        Mac = 1 << 4,
+        Relay = 1 << 10,
+        Rssi = 1 << 5,
+        Ssid = 1 << 2,
+        Status = 1 << 1,
+        Uptime = 1 << 6,
+        Vcc = 1 << 9,
+        Version = 1 << 14
     };
 
     constexpr uint32_t defaultValue() {
-        return (Status * (HEARTBEAT_REPORT_STATUS)) | \
-            (Ssid * (HEARTBEAT_REPORT_SSID)) | \
-            (Ip * (HEARTBEAT_REPORT_IP)) | \
-            (Mac * (HEARTBEAT_REPORT_MAC)) | \
-            (Rssi * (HEARTBEAT_REPORT_RSSI)) | \
-            (Uptime * (HEARTBEAT_REPORT_UPTIME)) | \
-            (Datetime * (HEARTBEAT_REPORT_DATETIME)) | \
-            (Freeheap * (HEARTBEAT_REPORT_FREEHEAP)) | \
-            (Vcc * (HEARTBEAT_REPORT_VCC)) | \
-            (Relay * (HEARTBEAT_REPORT_RELAY)) | \
-            (Light * (HEARTBEAT_REPORT_LIGHT)) | \
-            (Hostname * (HEARTBEAT_REPORT_HOSTNAME)) | \
-            (Description * (HEARTBEAT_REPORT_DESCRIPTION)) | \
-            (App * (HEARTBEAT_REPORT_APP)) | \
-            (Version * (HEARTBEAT_REPORT_VERSION)) | \
-            (Board * (HEARTBEAT_REPORT_BOARD)) | \
-            (Loadavg * (HEARTBEAT_REPORT_LOADAVG)) | \
-            (Interval * (HEARTBEAT_REPORT_INTERVAL));
+        return \
+            (App * (HEARTBEAT_REPORT_APP)) |                   \
+            (Board * (HEARTBEAT_REPORT_BOARD)) |               \
+            (Datetime * (HEARTBEAT_REPORT_DATETIME)) |         \
+            (Description * (HEARTBEAT_REPORT_DESCRIPTION)) |   \
+            (Freeheap * (HEARTBEAT_REPORT_FREEHEAP)) |         \
+            (Hostname * (HEARTBEAT_REPORT_HOSTNAME)) |         \
+            (Interval * (HEARTBEAT_REPORT_INTERVAL)) |         \
+            (Ip * (HEARTBEAT_REPORT_IP)) |                     \
+            (Light * (HEARTBEAT_REPORT_LIGHT)) |               \
+            (Loadavg * (HEARTBEAT_REPORT_LOADAVG)) |           \
+            (Mac * (HEARTBEAT_REPORT_MAC)) |                   \
+            (Relay * (HEARTBEAT_REPORT_RELAY)) |               \
+            (Rssi * (HEARTBEAT_REPORT_RSSI)) |                 \
+            (Ssid * (HEARTBEAT_REPORT_SSID)) |                 \
+            (Status * (HEARTBEAT_REPORT_STATUS)) |             \
+            (Uptime * (HEARTBEAT_REPORT_UPTIME)) |             \
+            (Vcc * (HEARTBEAT_REPORT_VCC)) |                   \
+            (Version * (HEARTBEAT_REPORT_VERSION));
     }
 
     uint32_t currentValue() {
@@ -235,7 +236,11 @@ void heartbeat() {
     #if MQTT_SUPPORT
         if (!serial && (_heartbeat_mode == HEARTBEAT_REPEAT || systemGetHeartbeat())) {
             if (hb_cfg & Heartbeat::Interval)
+                #if HOMIE_ENABLED
+                mqttSend(MQTT_TOPIC_INTERVAL, String(HEARTBEAT_INTERVAL + HOMIE_HEARTBEAT_INTERVAL_PAD).c_str());
+                #else
                 mqttSend(MQTT_TOPIC_INTERVAL, String(getHeartbeatInterval() / 1000).c_str());
+                #endif
 
             if (hb_cfg & Heartbeat::App)
                 mqttSend(MQTT_TOPIC_APP, APP_NAME);
@@ -249,11 +254,8 @@ void heartbeat() {
             if (hb_cfg & Heartbeat::Hostname)
                 mqttSend(MQTT_TOPIC_HOSTNAME, getSetting("hostname", getIdentifier()).c_str());
 
-            if (hb_cfg & Heartbeat::Description) {
-                if (hasSetting("desc")) {
-                    mqttSend(MQTT_TOPIC_DESCRIPTION, getSetting("desc").c_str());
-                }
-            }
+            if ((hb_cfg & Heartbeat::Description) && (hasSetting("desc")))
+                mqttSend(MQTT_TOPIC_DESCRIPTION, getSetting("desc").c_str());
 
             if (hb_cfg & Heartbeat::Ssid)
                 mqttSend(MQTT_TOPIC_SSID, WiFi.SSID().c_str());

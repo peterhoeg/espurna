@@ -89,7 +89,7 @@ static bool _rfbToChar(byte * in, char * out, int n = RF_MESSAGE_SIZE) {
 #if WEB_SUPPORT
 
 void _rfbWebSocketSendCodeArray(unsigned char start, unsigned char size) {
-    
+
     DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
 
@@ -106,7 +106,7 @@ void _rfbWebSocketSendCodeArray(unsigned char start, unsigned char size) {
     }
 
     wsSend(root);
-    
+
 }
 
 void _rfbWebSocketSendCode(unsigned char id) {
@@ -367,7 +367,7 @@ void _rfbDecode() {
         unsigned char id;
         unsigned char status;
         bool matched = _rfbMatch(buffer, id, status, buffer);
-        
+
         if (matched) {
             DEBUG_MSG_P(PSTR("[RF] Matched message '%s'\n"), buffer);
             _rfbin = true;
@@ -507,7 +507,7 @@ void _rfbParseCode(char * code) {
             _rfbSend(message, times);
         }
 
-    #endif // RF_RAW_SUPPORT    
+    #endif // RF_RAW_SUPPORT
 }
 
 #if MQTT_SUPPORT
@@ -548,7 +548,7 @@ void _rfbMqttCallback(unsigned int type, const char * topic, const char * payloa
         #if not RF_SUPPORT
             bool isRFOut = t.equals(MQTT_TOPIC_RFOUT);
         #endif
-        
+
         #if RF_RAW_SUPPORT
             bool isRFRaw = !isRFOut && t.equals(MQTT_TOPIC_RFRAW);
         #elif not RF_SUPPORT
@@ -628,7 +628,7 @@ void _rfbInitCommands() {
             terminalError(F("Wrong arguments"));
             return;
         }
-        
+
         int id = String(e->argv[1]).toInt();
         if (id >= relayCount()) {
             DEBUG_MSG_P(PSTR("-ERROR: Wrong relayID (%d)\n"), id);
@@ -649,7 +649,7 @@ void _rfbInitCommands() {
             terminalError(F("Wrong arguments"));
             return;
         }
-        
+
         int id = String(e->argv[1]).toInt();
         if (id >= relayCount()) {
             DEBUG_MSG_P(PSTR("-ERROR: Wrong relayID (%d)\n"), id);
@@ -673,15 +673,15 @@ void _rfbInitCommands() {
 // -----------------------------------------------------------------------------
 
 void rfbStore(unsigned char id, bool status, const char * code) {
-    DEBUG_MSG_P(PSTR("[RF] Storing %d-%s => '%s'\n"), id, status ? "ON" : "OFF", code);
+    DEBUG_MSG_P(PSTR("[RF] Storing %d-%s => '%s'\n"), id, status ? RELAY_MQTT_ON : RELAY_MQTT_OFF, code);
     char key[RF_MAX_KEY_LENGTH] = {0};
-    snprintf_P(key, sizeof(key), PSTR("rfb%s%d"), status ? "ON" : "OFF", id);
+    snprintf_P(key, sizeof(key), PSTR("rfb%s%d"), status ? RELAY_MQTT_ON : RELAY_MQTT_OFF, id);
     setSetting(key, code);
 }
 
 String rfbRetrieve(unsigned char id, bool status) {
     char key[RF_MAX_KEY_LENGTH] = {0};
-    snprintf_P(key, sizeof(key), PSTR("rfb%s%d"), status ? "ON" : "OFF", id);
+    snprintf_P(key, sizeof(key), PSTR("rfb%s%d"), status ? RELAY_MQTT_ON : RELAY_MQTT_ON, id);
     return getSetting(key);
 }
 

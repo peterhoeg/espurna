@@ -1294,7 +1294,11 @@ unsigned char magnitudeIndex(unsigned char index) {
 String magnitudeTopic(unsigned char type) {
     char buffer[16] = {0};
     if (type < MAGNITUDE_MAX) strncpy_P(buffer, magnitude_topics[type], sizeof(buffer));
-    return String(buffer);
+    #if HOMIE_ENABLED
+        return (String(MQTT_TOPIC_SENSOR) + "/" + buffer);
+    #else
+        return String(buffer);
+    #endif
 }
 
 String magnitudeTopicIndex(unsigned char index) {

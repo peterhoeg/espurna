@@ -61,6 +61,9 @@ PROGMEM const char espurna_modules[] =
     #if HOMEASSISTANT_SUPPORT
         "HOMEASSISTANT "
     #endif
+    #if HOMIE_SUPPORT
+        "HOMIE "
+    #endif
     #if I2C_SUPPORT
         "I2C "
     #endif

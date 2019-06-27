@@ -787,50 +787,55 @@
 #endif
 
 // These particles will be concatenated to the MQTT_TOPIC base to form the actual topic
-#define MQTT_TOPIC_JSON             "data"
 #define MQTT_TOPIC_ACTION           "action"
-#define MQTT_TOPIC_RELAY            "relay"
-#define MQTT_TOPIC_LED              "led"
-#define MQTT_TOPIC_BUTTON           "button"
-#define MQTT_TOPIC_IP               "ip"
-#define MQTT_TOPIC_SSID             "ssid"
-#define MQTT_TOPIC_VERSION          "version"
-#define MQTT_TOPIC_UPTIME           "uptime"
-#define MQTT_TOPIC_DATETIME         "datetime"
-#define MQTT_TOPIC_FREEHEAP         "freeheap"
-#define MQTT_TOPIC_VCC              "vcc"
-#define MQTT_TOPIC_STATUS           "status"
-#define MQTT_TOPIC_MAC              "mac"
-#define MQTT_TOPIC_RSSI             "rssi"
-#define MQTT_TOPIC_MESSAGE_ID       "id"
 #define MQTT_TOPIC_APP              "app"
-#define MQTT_TOPIC_INTERVAL         "interval"
-#define MQTT_TOPIC_HOSTNAME         "host"
-#define MQTT_TOPIC_DESCRIPTION      "desc"
-#define MQTT_TOPIC_TIME             "time"
-#define MQTT_TOPIC_RFOUT            "rfout"
-#define MQTT_TOPIC_RFIN             "rfin"
-#define MQTT_TOPIC_RFLEARN          "rflearn"
-#define MQTT_TOPIC_RFRAW            "rfraw"
-#define MQTT_TOPIC_UARTIN           "uartin"
-#define MQTT_TOPIC_UARTOUT          "uartout"
-#define MQTT_TOPIC_LOADAVG          "loadavg"
 #define MQTT_TOPIC_BOARD            "board"
-#define MQTT_TOPIC_PULSE            "pulse"
-#define MQTT_TOPIC_SPEED            "speed"
+#define MQTT_TOPIC_BUTTON           "button"
+#define MQTT_TOPIC_DATETIME         "datetime"
+#define MQTT_TOPIC_DESCRIPTION      "desc"
+#define MQTT_TOPIC_FREEHEAP         "freeheap"
+#define MQTT_TOPIC_HOSTNAME         "name"
+#define MQTT_TOPIC_INTERVAL         "interval"
+#define MQTT_TOPIC_IP               "ip"
 #define MQTT_TOPIC_IRIN             "irin"
 #define MQTT_TOPIC_IROUT            "irout"
+#define MQTT_TOPIC_JSON             "data"
+#define MQTT_TOPIC_LED              "led"
+#define MQTT_TOPIC_LIGHT            "light"
+#define MQTT_TOPIC_LOADAVG          "loadavg"
+#define MQTT_TOPIC_MAC              "mac"
+#define MQTT_TOPIC_MESSAGE_ID       "id"
+#define MQTT_TOPIC_NTP              "ntp"
 #define MQTT_TOPIC_OTA              "ota"
+#define MQTT_TOPIC_PULSE            "pulse"
+#define MQTT_TOPIC_RELAY            "relay"
+#define MQTT_TOPIC_RFIN             "rfin"
+#define MQTT_TOPIC_RFLEARN          "rflearn"
+#define MQTT_TOPIC_RFOUT            "rfout"
+#define MQTT_TOPIC_RFRAW            "rfraw"
+#define MQTT_TOPIC_SENSOR           "sensor"
+#define MQTT_TOPIC_RSSI             "rssi"
+#define MQTT_TOPIC_SENSOR           "sensor"
+#define MQTT_TOPIC_SPEED            "speed"
+#define MQTT_TOPIC_SSID             "ssid"
+#define MQTT_TOPIC_STATUS           "status"
+#define MQTT_TOPIC_SWITCH           "switch"
+#define MQTT_TOPIC_TIME             "time"
+#define MQTT_TOPIC_UARTIN           "uartin"
+#define MQTT_TOPIC_UARTOUT          "uartout"
+#define MQTT_TOPIC_UPTIME           "uptime"
+#define MQTT_TOPIC_VCC              "vcc"
+#define MQTT_TOPIC_VERSION          "version"
 
 // Light module
-#define MQTT_TOPIC_CHANNEL          "channel"
-#define MQTT_TOPIC_COLOR_RGB        "rgb"
-#define MQTT_TOPIC_COLOR_HSV        "hsv"
 #define MQTT_TOPIC_ANIM_MODE        "anim_mode"
 #define MQTT_TOPIC_ANIM_SPEED       "anim_speed"
 #define MQTT_TOPIC_BRIGHTNESS       "brightness"
-#define MQTT_TOPIC_MIRED            "mired"
+#define MQTT_TOPIC_CHANNEL          "channel"
+#define MQTT_TOPIC_COLOR_HSV        "hsv"
+#define MQTT_TOPIC_COLOR_RGB        "rgb"
 #define MQTT_TOPIC_KELVIN           "kelvin"
+#define MQTT_TOPIC_MIRED            "mired"
 #define MQTT_TOPIC_TRANSITION       "transition"
 
 #define MQTT_STATUS_ONLINE          "1"         // Value for the device ON message
@@ -1017,6 +1022,152 @@
 
 #ifndef HOMEASSISTANT_PAYLOAD_NOT_AVAILABLE
 #define HOMEASSISTANT_PAYLOAD_NOT_AVAILABLE "0" // Payload for available messages
+#endif
+
+// -----------------------------------------------------------------------------
+// HOMIE
+// -----------------------------------------------------------------------------
+
+#ifndef HOMIE_SUPPORT
+#define HOMIE_SUPPORT   MQTT_SUPPORT    // Build with homie support (if MQTT)
+#endif
+
+#ifndef HOMIE_ENABLED
+#define HOMIE_ENABLED   0               // Integration not enabled by default
+#endif
+
+#ifndef HOMIE_PREFIX
+#define HOMIE_PREFIX    "homie"         // Default MQTT prefix
+#endif
+
+#ifndef HOMIE_VERSION
+#define HOMIE_VERSION    "4.0"
+#endif
+
+#ifndef HOMIE_PAYLOAD_ON
+#define HOMIE_PAYLOAD_ON    "true"        // Payload for ON and available messages
+#endif
+
+#ifndef HOMIE_PAYLOAD_OFF
+#define HOMIE_PAYLOAD_OFF   "false"       // Payload for OFF and unavailable messages
+#endif
+
+#if HOMIE_ENABLED
+
+#undef MQTT_QOS
+#define MQTT_QOS                     1
+#undef MQTT_RETAIN
+#define MQTT_RETAIN                  true
+#undef MQTT_TOPIC
+#define MQTT_TOPIC                  "{hostname}"
+
+#undef MQTT_STATUS_ONLINE
+#define MQTT_STATUS_ONLINE          "ready"
+
+#undef MQTT_STATUS_OFFLINE
+#define MQTT_STATUS_OFFLINE         "lost"
+
+#undef MQTT_TOPIC_APP
+#define MQTT_TOPIC_APP              "$implementation"
+#undef MQTT_TOPIC_BUTTON
+#define MQTT_TOPIC_BUTTON           "buttons"
+#undef MQTT_TOPIC_HOSTNAME
+#define MQTT_TOPIC_HOSTNAME         "$name"
+#undef MQTT_TOPIC_INTERVAL
+#define MQTT_TOPIC_INTERVAL         "$stats/interval"
+#undef MQTT_TOPIC_IP
+#define MQTT_TOPIC_IP               "$localip"
+#undef MQTT_TOPIC_MAC
+#define MQTT_TOPIC_MAC              "$mac"
+#undef MQTT_TOPIC_LED
+#define MQTT_TOPIC_LED              "leds"
+#undef MQTT_TOPIC_LIGHT
+#define MQTT_TOPIC_LIGHT            "lights"
+#undef MQTT_TOPIC_RELAY
+#define MQTT_TOPIC_RELAY            "relays"
+#undef MQTT_TOPIC_SENSOR
+#define MQTT_TOPIC_SENSOR           "sensors"
+#undef MQTT_TOPIC_STATUS
+#define MQTT_TOPIC_STATUS           "$state"
+
+#define MQTT_TOPIC_NTP_CONNECTED    "connected"
+
+#undef RELAY_MQTT_ON
+#define RELAY_MQTT_ON               HOMIE_PAYLOAD_ON
+#undef RELAY_MQTT_OFF
+#define RELAY_MQTT_OFF              HOMIE_PAYLOAD_OFF
+
+// we have to pad the interval as some controllers have no
+// tolerance meaning a message that arrives 1ms after the
+// interval expiry will cause the device to go offline
+#define HOMIE_HEARTBEAT_INTERVAL_PAD 10
+
+#define HOMIE_DATATYPE      "$datatype"
+#define HOMIE_DATATYPE_BOOL "boolean"
+#define HOMIE_DATATYPE_ENUM "enum"
+#define HOMIE_FORMAT        "$format"
+#define HOMIE_NAME          "$name"
+#define HOMIE_NODES         "$nodes"
+#define HOMIE_PROPERTIES    "$properties"
+#define HOMIE_SETTABLE      "$settable"
+#define HOMIE_TYPE          "$type"
+
+// this can be set dynamically, so we need to push at the interval
+#undef HEARTBEAT_REPORT_DESCRIPTION
+#define HEARTBEAT_REPORT_DESCRIPTION 1
+
+#undef HEARTBEAT_REPORT_INTERVAL
+#define HEARTBEAT_REPORT_INTERVAL   0
+
+#undef HEARTBEAT_REPORT_STATUS
+#define HEARTBEAT_REPORT_STATUS     0
+
+#undef HEARTBEAT_REPORT_SSID
+#define HEARTBEAT_REPORT_SSID       0
+
+#undef HEARTBEAT_REPORT_IP
+#define HEARTBEAT_REPORT_IP         0
+
+#undef HEARTBEAT_REPORT_MAC
+#define HEARTBEAT_REPORT_MAC        0
+
+#undef HEARTBEAT_REPORT_RSSI
+#define HEARTBEAT_REPORT_RSSI       0
+
+#undef HEARTBEAT_REPORT_UPTIME
+#define HEARTBEAT_REPORT_UPTIME     0
+
+#undef HEARTBEAT_REPORT_DATETIME
+#define HEARTBEAT_REPORT_DATETIME   0
+
+#undef HEARTBEAT_REPORT_FREEHEAP
+#define HEARTBEAT_REPORT_FREEHEAP   0
+
+#undef HEARTBEAT_REPORT_VCC
+#define HEARTBEAT_REPORT_VCC        0
+
+#undef HEARTBEAT_REPORT_RELAY
+#define HEARTBEAT_REPORT_RELAY      0
+
+#undef HEARTBEAT_REPORT_LIGHT
+#define HEARTBEAT_REPORT_LIGHT      0
+
+#undef HEARTBEAT_REPORT_HOSTNAME
+#define HEARTBEAT_REPORT_HOSTNAME   0
+
+#undef HEARTBEAT_REPORT_APP
+#define HEARTBEAT_REPORT_APP        0
+
+#undef HEARTBEAT_REPORT_VERSION
+#define HEARTBEAT_REPORT_VERSION    0
+
+#undef HEARTBEAT_REPORT_BOARD
+#define HEARTBEAT_REPORT_BOARD      0
+
+#undef HEARTBEAT_REPORT_LOADAVG
+#define HEARTBEAT_REPORT_LOADAVG    0
+
+
 #endif
 
 // -----------------------------------------------------------------------------

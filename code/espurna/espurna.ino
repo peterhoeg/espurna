@@ -174,12 +174,6 @@ void setup() {
     #if IR_SUPPORT
         irSetup();
     #endif
-    #if DOMOTICZ_SUPPORT
-        domoticzSetup();
-    #endif
-    #if HOMEASSISTANT_SUPPORT
-        haSetup();
-    #endif
     #if SENSOR_SUPPORT
         sensorSetup();
     #endif
@@ -188,6 +182,17 @@ void setup() {
     #endif
     #if UART_MQTT_SUPPORT
         uartmqttSetup();
+    #endif
+
+    // Home Automation setup needs to be done after all hardware has been setup
+    #if DOMOTICZ_SUPPORT
+        domoticzSetup();
+    #endif
+    #if HOMEASSISTANT_SUPPORT
+        haSetup();
+    #endif
+    #if HOMIE_SUPPORT
+        homieSetup();
     #endif
 
 
