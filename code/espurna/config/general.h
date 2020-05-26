@@ -1030,6 +1030,7 @@
 
 #ifndef HOMIE_SUPPORT
 #define HOMIE_SUPPORT   MQTT_SUPPORT    // Build with homie support (if MQTT)
+#define MQTT_QOS        1               // Homie requires QoS 1
 #endif
 
 #ifndef HOMIE_ENABLED

@@ -8,6 +8,8 @@
 
 #if HOMIE_SUPPORT
 
+#define MQTT_QOS 1
+
 #include <algorithm>
 #include <queue>
 #include <vector>
